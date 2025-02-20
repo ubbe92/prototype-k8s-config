@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: csv-copier
+spec:
+  volumes:
+  - name: csv-config
+    configMap:
+      name: csv-data
+  - name: csv-storage
+    persistentVolumeClaim:
+      claimName: csv-data-pvc
+  containers:
+  - name: copier
+    image: busybox
+    command: ["/bin/sh", "-c", "cp /config/* /data/ && sleep 3600"]
+    volumeMounts:
+    - name: csv-config
+      mountPath: /config
+    - name: csv-storage
+      mountPath: /data
