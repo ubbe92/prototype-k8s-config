@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: csv-reader
+spec:
+  volumes:
+    - name: csv-storage
+      persistentVolumeClaim:
+        claimName: csv-data-pvc
+  containers:
+    - name: csv-reader
+      image: busybox
+      # command: ["/bin/sh", "-c", "ls /data/*.csv && cat /data/*.csv && sleep 3600"]
+      command: ["/bin/sh", "-c", "ls /app/csv_files/*.csv && sleep 3600"]
+      volumeMounts:
+        - name: csv-storage
+          mountPath: /app/csv_files
