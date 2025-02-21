@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prototype-silo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prototype-silo
+  template:
+    metadata:
+      labels:
+        app: prototype-silo
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: prototype-silo
+          image: ubbe92/prototype-silo
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 30000
+            - containerPort: 11111
+            - containerPort: 9090
+          env:
+            - name: QUERY_SENTINEL
+              value: "true"

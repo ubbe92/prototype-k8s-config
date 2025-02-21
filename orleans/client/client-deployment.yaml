@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prototype-client
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: prototype-client
+  template:
+    metadata:
+      labels:
+        app: prototype-client
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      volumes:
+        - name: csv-storage
+          persistentVolumeClaim:
+            claimName: csv-data-pvc
+      containers:
+        - name: prototype-client
+          image: ubbe92/prototype-client
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+          # command: ["/bin/sh", "-c", "ls /app/csv_files/*.csv && sleep 3600"]
+          volumeMounts:
+            - name: csv-storage
+              mountPath: /app/csv_files
