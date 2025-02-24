@@ -22,9 +22,12 @@ spec:
         - name: prototype-client
           image: ubbe92/prototype-client
           resources:
-            limits:
+            requests:
               memory: "128Mi"
               cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
           ports:
             - containerPort: 8080
           # command: ["/bin/sh", "-c", "ls /app/csv_files/*.csv && sleep 3600"]
