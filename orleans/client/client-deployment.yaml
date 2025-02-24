@@ -15,9 +15,9 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
       volumes:
-        - name: csv-storage
+        - name: nfs-volume
           persistentVolumeClaim:
-            claimName: csv-data-pvc
+            claimName: nfs-pvc
       containers:
         - name: prototype-client
           image: ubbe92/prototype-client
@@ -29,5 +29,5 @@ spec:
             - containerPort: 8080
           # command: ["/bin/sh", "-c", "ls /app/csv_files/*.csv && sleep 3600"]
           volumeMounts:
-            - name: csv-storage
+            - name: nfs-volume
               mountPath: /app/csv_files
