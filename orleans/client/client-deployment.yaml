@@ -24,10 +24,15 @@ spec:
           resources:
             limits:
               memory: "128Mi"
-              cpu: "500m"
+              cpu: "250m"
           ports:
             - containerPort: 8080
           # command: ["/bin/sh", "-c", "ls /app/csv_files/*.csv && sleep 3600"]
           volumeMounts:
             - name: nfs-volume
               mountPath: /app/csv_files
+          env:
+            - name: NUM_THREADS
+              value: "2"
+            - name: QUERY_SENTINEL
+              value: "true"
