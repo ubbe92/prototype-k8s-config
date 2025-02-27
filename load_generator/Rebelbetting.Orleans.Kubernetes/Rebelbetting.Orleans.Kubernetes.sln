@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rebelbetting.Orleans.Kubernetes.LoadGenerator", "Rebelbetting.Orleans.Kubernetes.LoadGenerator\Rebelbetting.Orleans.Kubernetes.LoadGenerator.csproj", "{160C529D-076D-49A2-8C19-B71C5CFFF6CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{160C529D-076D-49A2-8C19-B71C5CFFF6CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160C529D-076D-49A2-8C19-B71C5CFFF6CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160C529D-076D-49A2-8C19-B71C5CFFF6CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160C529D-076D-49A2-8C19-B71C5CFFF6CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
