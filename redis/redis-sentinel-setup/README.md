@@ -44,4 +44,16 @@ sudo kubectl -n redis get pv
 sudo kubectl -n redis logs sentinel-0
 ```
 
+URL to the sentinel service is on the following format
 
+```bash
+<service-name>.<namespace>.svc.cluster.local:<service-port>
+```
+
+hence the URL in this case would be
+
+```bash
+sentinel.redis.svc.cluster.local:5000
+```
+
+please check the .yaml files used above for more details.
