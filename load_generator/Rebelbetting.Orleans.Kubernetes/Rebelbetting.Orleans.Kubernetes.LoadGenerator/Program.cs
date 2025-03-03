@@ -14,6 +14,15 @@ using ScottPlot.Plottables;
 // Plots
 // https://scottplot.net/quickstart/console/
 
+var commandLineArgs =  Environment.GetCommandLineArgs();
+bool populateOrleans = false;
+
+if (commandLineArgs.Length == 2)
+{
+    Console.WriteLine($"args len: {commandLineArgs.Length}, arg[1]: {commandLineArgs[1]}");
+    populateOrleans = Convert.ToBoolean(commandLineArgs[1]);
+}
+
 var port = 8080;
 var ip = "http://192.168.0.23";
 
@@ -57,8 +66,12 @@ var yLabel = "Latency (ms)";
 var saveLocation = "";
 var title = "";
 
-// response = orleansPerformanceTests.Initialize();
-// Console.WriteLine($"Response init: {response}");
+if (populateOrleans)
+{
+    var response = orleansPerformanceTests.Initialize();
+    Console.WriteLine($"Response init: {response}");
+}
+
 // ------------------------------------------------------------------------------
 // Performance tests
 // ------------------------------------------------------------------------------
@@ -71,22 +84,4 @@ saveLocation = "./figures/MakePopulationPlotMapOddsNWorkers.png";
 title = $"Mapping latency of {odds.Length} odds sent in parallel batches of various sizes from {numThreads} worker(s). Each test was repeated {numIterations} times";
 orleansPerformanceTests.MakePopulationPlotMapOddsNWorkers(odds, numIterations, chunkSize, numBoxes, tp, tl, 
     showMarker, xLabel, yLabel, saveLocation, title, numThreads);
-
-// for (int i = 0; i < numIterations; i++)
-// {
-//     var result = orleansPerformanceTests.MapOddsOneWorker(odds, 50);
-//     Console.WriteLine($"MapOddsOneWorker:\t{result.Result}\tms");
-// }
-
-// for (int i = 0; i < numIterations; i++)
-// {
-//     var result = orleansPerformanceTests.MapOddsNWorkers(odds, 50, numThreads);
-//     Console.WriteLine($"MapOddsNWorkers:\t{result.Result}\tms using: {numThreads} threads");
-// }
-
-
-// List<double[]> ld = new List<double[]>();
-// ld.Add(dataY);
-// ld.Add(dataY1);
-// pg.CreatePopulationPlot("En titel", "./figures/pop.png", ld, 
-//     [0, 1], ["8", "16"], true, "xLabel", "yLabel");
+    
