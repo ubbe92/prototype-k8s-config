@@ -1,4 +1,7 @@
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Rebelbetting.Orleans.LoadGenerator.parsing;
 
 namespace Rebelbetting.Orleans.LoadGenerator.http;
 
@@ -6,11 +9,11 @@ public class HttpRequestService
 {
     private readonly HttpClient _httpClient;
 
-    public HttpRequestService(string baseUrl, int port)
+    public HttpRequestService(string ip, int port)
     {
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri($"{baseUrl}:{port}")
+            BaseAddress = new Uri($"{ip}:{port}")
         };
     }
 
@@ -19,6 +22,14 @@ public class HttpRequestService
         var url = _httpClient.BaseAddress + "createcsvgrains";
         var values = new Dictionary<string, string> {};
         var content = new FormUrlEncodedContent(values);
+        var response = await _httpClient.PostAsync(url, content);
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    public async Task<string> ProcessOdds(ContractOdds[] odds)
+    {
+        var url = _httpClient.BaseAddress + "processodds";
+        var content = JsonContent.Create(odds);
         var response = await _httpClient.PostAsync(url, content);
         return await response.Content.ReadAsStringAsync();
     }

@@ -1,7 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using Rebelbetting.Orleans.LoadGenerator.http;
+using Rebelbetting.Orleans.LoadGenerator.parsing;
 using Rebelbetting.Orleans.LoadGenerator.plots;
+using Rebelbetting.Orleans.LoadGenerator.tests;
 using ScottPlot;
 using ScottPlot.Plottables;
 
@@ -11,95 +14,79 @@ using ScottPlot.Plottables;
 // Plots
 // https://scottplot.net/quickstart/console/
 
-double[] dataX = { 1, 2, 3, 4, 5 };
-double[] dataY = { 1, 4, 9, 16, 25 };
+var port = 8080;
+var ip = "http://192.168.0.23";
 
-double[] dataX1 = { 3, 6, 3, 2, 8 };
-double[] dataY1 = { 9, 15, 3, 12, 5 };
+// ------------------------------------------------------------------------------
+// Parse odds csv file before running tests
+// ------------------------------------------------------------------------------
+var pathToOddsFile = "./csv_files/Odds.csv";
+var delimiter = ";";
 
-ScottPlot.Plot myPlot = new();
-myPlot.Title("HELLO");
-var p1 = myPlot.Add.Scatter(dataX, dataY);
-p1.LegendText = "p1";
-
-var p2 = myPlot.Add.Scatter(dataX1, dataY1);
-p2.LegendText = "p2";
-
-myPlot.Legend.IsVisible = true;
-myPlot.Legend.Alignment = Alignment.UpperCenter;
-
-myPlot.Legend.ShadowColor = Colors.Blue.WithOpacity(.2);
-myPlot.Legend.ShadowOffset = new(10, 10);
-
-myPlot.Legend.FontName = Fonts.Serif;
-myPlot.ShowLegend();
-
-// This has to be run from the terminal. If i run it through Rider it wants to save the image to:
-//
-// '/Users/antondacklin/Documents/gitlab/prototype-k8s-config/load_generator/Rebelbetting.Orleans.LoadGenerator/
-// Rebelbetting.Orleans.Kubernetes.LoadGenerator/bin/Debug/net9.0/plots/quickstart.png'
-myPlot.SavePng("./figures/quickstart.png", 400, 300);
-Console.WriteLine("Hello, World!");
-
-var pg = new PlotGenerator();
-var boxes = new List<Box>();
-Random rnd = new Random();
-double[] tickPositions = { 0, 1, 2, 3 }; // Positions for your boxplots
-string[] tickLabels = { "128", "256", "512", "1024" }; // Your custom labels
-for (int i = 0; i < 4; i++)
+if (!File.Exists(pathToOddsFile))
 {
-    var b = pg.CreateBox(i, rnd.Next(10, 13), rnd.Next(15, 20), rnd.Next(3, 8), rnd.Next(25, 33), rnd.Next(13, 15));
-    boxes.Add(b);
+    Console.WriteLine($"Could not find csv file!");
+    Environment.Exit(1);
 }
 
-pg.Width = 800;
-pg.Height = 600;
-pg.CreateBoxPlot("EN TITEL", "./figures/box.png", boxes, tickPositions, tickLabels);
+var csvFileReader = new CsvFileReader<OddsDto>(pathToOddsFile, delimiter);
+var oddsDtos = csvFileReader.Records.ToArray();
+var odds = csvFileReader.ConvertOddsDtoToContractOdds(oddsDtos);
+csvFileReader.CleanUp();
 
-List<double[]> ld = new List<double[]>();
-ld.Add(dataY);
-ld.Add(dataY1);
-pg.CreatePopulationPlot("En titel", "./figures/pop.png", ld, 
-    [0, 1], ["8", "16"], true, "xLabel", "yLabel");
+// ------------------------------------------------------------------------------
+// Performance tests init
+// ------------------------------------------------------------------------------
+var orleansPerformanceTests = new OrleansPerformanceTests(ip, port);
+var numThreads = 6;
+var numIterations = 10;
+var factor = 1;
+var chunkSize = 50;
+var numBoxes = 6;
 
-// ---------------------------------------
-// Test HTTP requests
-// ---------------------------------------
-// var client = new HttpClient();
-// var port = 8162;
-// var url = $"http://127.0.0.1:{port}/createcsvgrains";
-// var values = new Dictionary<string, string> {};
-//
-// var content = new FormUrlEncodedContent(values);
-//
-// var response = await client.PostAsync(url, content);
-//
-// var responseString = await response.Content.ReadAsStringAsync();
-//
-// Console.WriteLine($"RESPONSE FROM CREATE CSV GRAINS: {responseString}");
+double[] tp = Enumerable.Range(0, numBoxes).Select(x => (double) x).ToArray();
+string[] tl = new string[numBoxes];
+for (int i = 0; i < numBoxes; i++)
+{
+    tl[i] = $"{chunkSize * factor}";
+    factor *= 2;
+}
+bool showMarker = true;
+var xLabel = "Batch sizes";
+var yLabel = "Latency (ms)";
+var saveLocation = "";
+var title = "";
+
+// response = orleansPerformanceTests.Initialize();
+// Console.WriteLine($"Response init: {response}");
+// ------------------------------------------------------------------------------
+// Performance tests
+// ------------------------------------------------------------------------------
+saveLocation = "./figures/MakePopulationPlotMapOddsOneWorker.png";
+title = $"Mapping latency of {odds.Length} odds sent in batches of various sizes from {1} worker(s). Each test was repeated {numIterations} times";
+orleansPerformanceTests.MakePopulationPlotMapOddsOneWorker(odds, numIterations, chunkSize, numBoxes, tp, tl, 
+    showMarker, xLabel, yLabel, saveLocation, title);
+
+saveLocation = "./figures/MakePopulationPlotMapOddsNWorkers.png";
+title = $"Mapping latency of {odds.Length} odds sent in parallel batches of various sizes from {numThreads} worker(s). Each test was repeated {numIterations} times";
+orleansPerformanceTests.MakePopulationPlotMapOddsNWorkers(odds, numIterations, chunkSize, numBoxes, tp, tl, 
+    showMarker, xLabel, yLabel, saveLocation, title, numThreads);
+
+// for (int i = 0; i < numIterations; i++)
+// {
+//     var result = orleansPerformanceTests.MapOddsOneWorker(odds, 50);
+//     Console.WriteLine($"MapOddsOneWorker:\t{result.Result}\tms");
+// }
+
+// for (int i = 0; i < numIterations; i++)
+// {
+//     var result = orleansPerformanceTests.MapOddsNWorkers(odds, 50, numThreads);
+//     Console.WriteLine($"MapOddsNWorkers:\t{result.Result}\tms using: {numThreads} threads");
+// }
 
 
-// var port = 8081;
-// var url = "http://127.0.0.1";
-
-// var port = 8080;
-// var url = "http://192.168.0.23";
-// var httpRequestService = new HttpRequestService(url, port);
-// // var initResp = httpRequestService.InitiateCsvProcessing();
-// // Console.WriteLine($"response: {initResp.Result}");
-//
-// int grainId = 732488;
-// var resp = httpRequestService.GetEventGrain(grainId);
-// Console.WriteLine($"response: {resp.Result}");
-//
-// string grainNameId = "event:Handball:I Liga (Poland)";
-// resp = httpRequestService.GetEventNameGrain(grainNameId);
-// Console.WriteLine($"response: {resp.Result}");
-//
-// grainId = 4866250;
-// resp = httpRequestService.GetParticipantGrain(grainId);
-// Console.WriteLine($"response: {resp.Result}");
-//
-// grainNameId = "participant:Handball:Croatia";
-// resp = httpRequestService.GetParticipantNameGrain(grainNameId);
-// Console.WriteLine($"response: {resp.Result}");
+// List<double[]> ld = new List<double[]>();
+// ld.Add(dataY);
+// ld.Add(dataY1);
+// pg.CreatePopulationPlot("En titel", "./figures/pop.png", ld, 
+//     [0, 1], ["8", "16"], true, "xLabel", "yLabel");
