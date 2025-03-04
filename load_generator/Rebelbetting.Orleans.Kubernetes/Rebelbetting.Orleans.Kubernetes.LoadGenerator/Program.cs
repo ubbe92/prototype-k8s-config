@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using Microsoft.VisualBasic.CompilerServices;
 using Rebelbetting.Orleans.LoadGenerator.http;
 using Rebelbetting.Orleans.LoadGenerator.parsing;
 using Rebelbetting.Orleans.LoadGenerator.plots;
@@ -15,24 +16,49 @@ using ScottPlot.Plottables;
 // https://scottplot.net/quickstart/console/
 
 var commandLineArgs =  Environment.GetCommandLineArgs();
-bool populateOrleans = false;
-
-if (commandLineArgs.Length == 2)
-{
-    Console.WriteLine($"args len: {commandLineArgs.Length}, arg[1]: {commandLineArgs[1]}");
-    populateOrleans = Convert.ToBoolean(commandLineArgs[1]);
-}
-
+var populateOrleans = false;
 var port = 8080;
 var ip = "http://192.168.0.23";
-
-// ------------------------------------------------------------------------------
-// Parse odds csv file before running tests
-// ------------------------------------------------------------------------------
 var pathToOddsFile = "./csv_files/Odds.csv";
 // var pathToOddsFile = "/Users/antondacklin/Documents/master-thesis-data/RBData/odds/OddsCache.csv";
 var delimiter = ",";
 
+if (commandLineArgs.Contains("-explanation"))
+{
+    Console.WriteLine($"Usage: dotnet run <PopulateOrleans> <Port> <IP> [-explanation]");
+    Console.WriteLine($"\t<PopulateOrleans> : Should be 'true' if orleans should be populated with events and participant grains otherwise 'false'.");
+    Console.WriteLine($"\t<Port>            : The port used by remote Orleans client, usually 8080.");
+    Console.WriteLine($"\t<IP>              : The IP of a remote Orleans clients in an Orleans cluster.");
+    Console.WriteLine($"\t<PathToOddsCsv>   : Odds.csv file path.");
+    Console.WriteLine($"\t<Delimiter>       : Which delimiter to use when parsing Odds.csv, either ';' or ','.");
+    Environment.Exit(0);
+}
+
+if (commandLineArgs.Length == 6)
+{
+    populateOrleans = Convert.ToBoolean(commandLineArgs[1]);
+    port = int.Parse(commandLineArgs[2]);
+    ip = commandLineArgs[3];
+    pathToOddsFile = commandLineArgs[4];
+    delimiter = commandLineArgs[5];
+
+    Console.WriteLine($"populate?   >> '{populateOrleans}'");
+    Console.WriteLine($"port        >> '{port}'");
+    Console.WriteLine($"IP          >> '{ip}'");
+    Console.WriteLine($"path        >> '{pathToOddsFile}'");
+    Console.WriteLine($"delimiter   >> '{delimiter}'");
+}
+else
+{
+    Console.WriteLine($"Usage: dotnet run <PopulateOrleans> <Port> <IP> <PathToOddsCsv> <Delimiter> [-explanation]");
+    Console.WriteLine($"Example:\n\tdotnet run false 8080 http://192.168.0.23 ./csv_files/Odds.csv ,");
+    Environment.Exit(1);
+}
+
+
+// ------------------------------------------------------------------------------
+// Parse odds csv file before running tests
+// ------------------------------------------------------------------------------
 if (!File.Exists(pathToOddsFile))
 {
     Console.WriteLine($"Could not find csv file!");
