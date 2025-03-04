@@ -30,7 +30,8 @@ var ip = "http://192.168.0.23";
 // Parse odds csv file before running tests
 // ------------------------------------------------------------------------------
 var pathToOddsFile = "./csv_files/Odds.csv";
-var delimiter = ";";
+// var pathToOddsFile = "/Users/antondacklin/Documents/master-thesis-data/RBData/odds/OddsCache.csv";
+var delimiter = ",";
 
 if (!File.Exists(pathToOddsFile))
 {
@@ -42,6 +43,7 @@ var csvFileReader = new CsvFileReader<OddsDto>(pathToOddsFile, delimiter);
 var oddsDtos = csvFileReader.Records.ToArray();
 var odds = csvFileReader.ConvertOddsDtoToContractOdds(oddsDtos);
 csvFileReader.CleanUp();
+Console.WriteLine($"length of csv: {odds.Length} at location: '{pathToOddsFile}'");
 
 // ------------------------------------------------------------------------------
 // Performance tests init
