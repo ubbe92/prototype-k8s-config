@@ -25,7 +25,7 @@ public class OrleansPerformanceTests
         return response.Result;
     }
 
-    private async Task<double> MapOddsOneWorker(ContractOdds[] odds, int chunkSize)
+    public async Task<double> MapOddsOneWorker(ContractOdds[] odds, int chunkSize)
     {
         var httpRequestService = new HttpRequestService(_ip, _port);
         var chunks = odds.Chunk(chunkSize);

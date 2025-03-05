@@ -85,7 +85,7 @@ public class CsvFileReader<T> where T : class
     {
         public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
         {
-            return text.Trim('"');
+            return text.Trim('"').Replace("´", "'"); // Fix issue with strange quotes and ´ found in the odds.csv...
         }
     }
     

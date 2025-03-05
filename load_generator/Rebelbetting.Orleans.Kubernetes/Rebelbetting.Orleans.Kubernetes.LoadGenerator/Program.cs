@@ -1,4 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
+
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using Microsoft.VisualBasic.CompilerServices;
@@ -76,19 +78,23 @@ Console.WriteLine($"length of csv: {odds.Length} at location: '{pathToOddsFile}'
 // ------------------------------------------------------------------------------
 var orleansPerformanceTests = new OrleansPerformanceTests(ip, port);
 var numThreads = 6;
-var numIterations = 10;
-var factor = 1;
-var chunkSize = 50;
-var numBoxes = 6;
+// var numIterations = 10;
+// var chunkSize = 50;
+// var numBoxes = 6;
+
+var numIterations = 3;
+var chunkSize = 100;
+var numBoxes = 3;
 
 double[] tp = Enumerable.Range(0, numBoxes).Select(x => (double) x).ToArray();
 string[] tl = new string[numBoxes];
+var factor = 1;
 for (int i = 0; i < numBoxes; i++)
 {
     tl[i] = $"{chunkSize * factor}";
     factor *= 2;
 }
-bool showMarker = true;
+var showMarker = true;
 var xLabel = "Batch sizes";
 var yLabel = "Latency (ms)";
 var saveLocation = "";
@@ -100,16 +106,28 @@ if (populateOrleans)
     Console.WriteLine($"Response init: {response}");
 }
 
+// TEST TIMER
+// var chunks = odds.Chunk(2).ToArray();
+// await orleansPerformanceTests.MapOddsOneWorker(chunks[0], 2);
+// Console.WriteLine($"Done!");
+// return;
+
+var watch = Stopwatch.StartNew();
+
 // ------------------------------------------------------------------------------
 // Performance tests
 // ------------------------------------------------------------------------------
-saveLocation = "./figures/MakePopulationPlotMapOddsOneWorker.png";
-title = $"Mapping latency of {odds.Length} odds sent in batches of various sizes from {1} worker(s). Each test was repeated {numIterations} times";
-orleansPerformanceTests.MakePopulationPlotMapOddsOneWorker(odds, numIterations, chunkSize, numBoxes, tp, tl, 
-    showMarker, xLabel, yLabel, saveLocation, title);
+// saveLocation = "./figures/MakePopulationPlotMapOddsOneWorker.png";
+// title = $"Mapping latency of {odds.Length} odds sent in batches of various sizes from {1} worker(s). Each test was repeated {numIterations} times";
+// orleansPerformanceTests.MakePopulationPlotMapOddsOneWorker(odds, numIterations, chunkSize, numBoxes, tp, tl, 
+//     showMarker, xLabel, yLabel, saveLocation, title);
 
 saveLocation = "./figures/MakePopulationPlotMapOddsNWorkers.png";
 title = $"Mapping latency of {odds.Length} odds sent in parallel batches of various sizes from {numThreads} worker(s). Each test was repeated {numIterations} times";
 orleansPerformanceTests.MakePopulationPlotMapOddsNWorkers(odds, numIterations, chunkSize, numBoxes, tp, tl, 
     showMarker, xLabel, yLabel, saveLocation, title, numThreads);
     
+    
+watch.Stop();
+
+Console.WriteLine($"All tests took: {watch.ElapsedMilliseconds} ms");
