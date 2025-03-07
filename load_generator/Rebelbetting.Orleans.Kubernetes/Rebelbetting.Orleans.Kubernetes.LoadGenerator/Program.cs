@@ -24,6 +24,7 @@ var ip = "http://192.168.0.23";
 var pathToOddsFile = "./csv_files/Odds.csv";
 // var pathToOddsFile = "/Users/antondacklin/Documents/master-thesis-data/RBData/odds/OddsCache.csv";
 var delimiter = ",";
+var numThreads = 1;
 
 if (commandLineArgs.Contains("-explanation"))
 {
@@ -33,16 +34,18 @@ if (commandLineArgs.Contains("-explanation"))
     Console.WriteLine($"\t<IP>              : The IP of a remote Orleans clients in an Orleans cluster.");
     Console.WriteLine($"\t<PathToOddsCsv>   : Odds.csv file path.");
     Console.WriteLine($"\t<Delimiter>       : Which delimiter to use when parsing Odds.csv, either ';' or ','.");
+    Console.WriteLine($"\t<NumThreads>      : The number of threads to use (Simulates the number of workers).");
     Environment.Exit(0);
 }
 
-if (commandLineArgs.Length == 6)
+if (commandLineArgs.Length == 7)
 {
     populateOrleans = Convert.ToBoolean(commandLineArgs[1]);
     port = int.Parse(commandLineArgs[2]);
     ip = commandLineArgs[3];
     pathToOddsFile = commandLineArgs[4];
     delimiter = commandLineArgs[5];
+    numThreads = Convert.ToInt32(commandLineArgs[6]);
 
     Console.WriteLine($"populate?   >> '{populateOrleans}'");
     Console.WriteLine($"port        >> '{port}'");
@@ -52,21 +55,20 @@ if (commandLineArgs.Length == 6)
 }
 else
 {
-    Console.WriteLine($"Usage: dotnet run <PopulateOrleans> <Port> <IP> <PathToOddsCsv> <Delimiter> [-explanation]");
-    Console.WriteLine($"Example:\n\tdotnet run false 8080 http://192.168.0.23 ./csv_files/Odds.csv ,");
+    Console.WriteLine($"Usage: dotnet run <PopulateOrleans> <Port> <IP> <PathToOddsCsv> <Delimiter> <NumThreads> [-explanation]");
+    Console.WriteLine($"Example:\n\tdotnet run false 8080 http://192.168.0.23 ./csv_files/Odds.csv , 6");
     Environment.Exit(1);
 }
 
-
-// ------------------------------------------------------------------------------
-// Parse odds csv file before running tests
-// ------------------------------------------------------------------------------
 if (!File.Exists(pathToOddsFile))
 {
     Console.WriteLine($"Could not find csv file!");
     Environment.Exit(1);
 }
 
+// ------------------------------------------------------------------------------
+// Parse odds csv file before running tests
+// ------------------------------------------------------------------------------
 var csvFileReader = new CsvFileReader<OddsDto>(pathToOddsFile, delimiter);
 var oddsDtos = csvFileReader.Records.ToArray();
 var odds = csvFileReader.ConvertOddsDtoToContractOdds(oddsDtos);
@@ -77,14 +79,13 @@ Console.WriteLine($"length of csv: {odds.Length} at location: '{pathToOddsFile}'
 // Performance tests init
 // ------------------------------------------------------------------------------
 var orleansPerformanceTests = new OrleansPerformanceTests(ip, port);
-var numThreads = 6;
 // var numIterations = 10;
 // var chunkSize = 50;
 // var numBoxes = 6;
 
-var numIterations = 3;
+var numIterations = 1;
 var chunkSize = 100;
-var numBoxes = 3;
+var numBoxes = 1;
 
 double[] tp = Enumerable.Range(0, numBoxes).Select(x => (double) x).ToArray();
 string[] tl = new string[numBoxes];
