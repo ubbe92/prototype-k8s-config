@@ -83,9 +83,9 @@ var orleansPerformanceTests = new OrleansPerformanceTests(ip, port);
 // var chunkSize = 50;
 // var numBoxes = 6;
 
-var numIterations = 1;
-var chunkSize = 100;
-var numBoxes = 1;
+var numIterations = 5;
+var chunkSize = 50;
+var numBoxes = 6;
 
 double[] tp = Enumerable.Range(0, numBoxes).Select(x => (double) x).ToArray();
 string[] tl = new string[numBoxes];
@@ -127,6 +127,13 @@ saveLocation = "./figures/MakePopulationPlotMapOddsNWorkers.png";
 title = $"Mapping latency of {odds.Length} odds sent in parallel batches of various sizes from {numThreads} worker(s). Each test was repeated {numIterations} times";
 orleansPerformanceTests.MakePopulationPlotMapOddsNWorkers(odds, numIterations, chunkSize, numBoxes, tp, tl, 
     showMarker, xLabel, yLabel, saveLocation, title, numThreads);
+
+
+// var oddsChunk = odds.Chunk(2000).ToArray();
+// saveLocation = "./figures/MakePopulationPlotMapOddsNWorkers.png";
+// title = $"Mapping latency of {oddsChunk[0].Length} odds sent in parallel batches of various sizes from {numThreads} worker(s). Each test was repeated {numIterations} times";
+// orleansPerformanceTests.MakePopulationPlotMapOddsNWorkers(oddsChunk[0], numIterations, chunkSize, numBoxes, tp, tl, 
+//     showMarker, xLabel, yLabel, saveLocation, title, numThreads);
     
     
 watch.Stop();
