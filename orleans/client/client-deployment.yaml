@@ -35,8 +35,8 @@ spec:
             - name: nfs-volume
               mountPath: /app/csv_files
           env:
-            - name: NUM_THREADS
-              value: "2"
+            - name: NUM_WORKERS
+              value: "4"
             - name: QUERY_SENTINEL
               value: "true"
             - name: SHOW_DEBUG
