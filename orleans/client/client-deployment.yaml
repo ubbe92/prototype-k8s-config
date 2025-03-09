@@ -35,7 +35,9 @@ spec:
             - name: nfs-volume
               mountPath: /app/csv_files
           env:
-            - name: NUM_WORKERS
+            - name: NUM_WORKERS_REDIS
+              value: "12"
+            - name: NUM_WORKERS_ODDS
               value: "12"
             - name: QUERY_SENTINEL
               value: "true"
