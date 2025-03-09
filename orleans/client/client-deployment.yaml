@@ -40,4 +40,4 @@ spec:
             - name: QUERY_SENTINEL
               value: "true"
             - name: SHOW_DEBUG
-              value: "true"
+              value: "false"
