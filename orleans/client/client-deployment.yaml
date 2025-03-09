@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: prototype-client
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: prototype-client
@@ -26,8 +26,8 @@ spec:
               memory: "128Mi"
               cpu: "200m"
             limits:
-              memory: "2Gi"
-              cpu: "1000m"
+              memory: "1Gi"
+              cpu: "800m"
           ports:
             - containerPort: 8080
           # command: ["/bin/sh", "-c", "ls /app/csv_files/*.csv && sleep 3600"]
