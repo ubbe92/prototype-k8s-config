@@ -36,7 +36,7 @@ spec:
               mountPath: /app/csv_files
           env:
             - name: NUM_WORKERS
-              value: "4"
+              value: "8"
             - name: QUERY_SENTINEL
               value: "true"
             - name: SHOW_DEBUG
