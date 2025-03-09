@@ -31,6 +31,9 @@ public class HttpRequestService
         var url = _httpClient.BaseAddress + "processodds";
         var content = JsonContent.Create(odds);
         var response = await _httpClient.PostAsync(url, content);
+        
+        // await response.Content.ReadFromJsonAsync<ContractCreateCsvGrainResponse>(); // Is this how we deserialize the response?
+        
         return await response.Content.ReadAsStringAsync();
     }
 
