@@ -84,8 +84,8 @@ var orleansPerformanceTests = new OrleansPerformanceTests(ip, port);
 // var numBoxes = 6;
 
 var numIterations = 5;
-var chunkSize = 50;
-var numBoxes = 6;
+var chunkSize = 100;
+var numBoxes = 5;
 
 double[] tp = Enumerable.Range(0, numBoxes).Select(x => (double) x).ToArray();
 string[] tl = new string[numBoxes];
